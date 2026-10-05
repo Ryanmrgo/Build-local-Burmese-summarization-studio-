@@ -16,6 +16,133 @@ The app uses Gradio for the interface and PyTorch plus Hugging Face Transformers
 - Responsive Gradio interface
 - Clear local model-file errors
 
+## Model reference
+
+The following sections are formatted like presentation slides and can be reused in a project presentation.
+
+### Slide 1: Model overview
+
+- **Model:** Fine-tuned mT5-small
+- **Task:** Burmese article summarization
+- **Model type:** Text-to-text encoder-decoder Transformer
+- **Framework:** PyTorch and Hugging Face Transformers
+- **Runtime:** Local inference only
+- **Output language:** Burmese
+
+The model receives a Burmese article and generates a shorter Burmese draft that preserves the main idea of the source text.
+
+### Slide 2: Transformer architecture
+
+mT5-small uses an encoder-decoder architecture:
+
+```text
+Burmese article
+	|
+	v
+Syllable segmentation + "summarize:" prefix
+	|
+	v
+Tokenizer and encoder
+	|
+	v
+Decoder with beam search
+	|
+	v
+Burmese summary
+```
+
+Checkpoint configuration:
+
+- 8 encoder layers
+- 8 decoder layers
+- 6 attention heads
+- Model dimension: 512
+- Feed-forward dimension: 1,024
+- Vocabulary size: 250,112 tokens
+- Encoder-decoder sequence-to-sequence design
+
+### Slide 3: Training data
+
+The training notebook used Burmese news-style summarization data from the XL-Sum dataset:
+
+- Training examples: 4,569
+- Validation examples: 570
+- Language: Burmese
+- Training objective: Generate a summary from an article
+- Training duration: 4 epochs
+- Learning rate: `3e-4`
+- Training batch size: 4
+- Gradient accumulation: 8 steps
+- Mixed precision: disabled during the final training configuration
+
+### Slide 4: Burmese preprocessing
+
+The model uses Burmese syllable segmentation before tokenization.
+
+The preprocessing pipeline:
+
+1. Trim leading and trailing whitespace.
+2. Normalize repeated whitespace.
+3. Separate Burmese syllable boundaries using the training regular expression.
+4. Add the task prefix:
+
+```text
+summarize:
+```
+
+5. Tokenize the processed text.
+
+Using the same preprocessing during inference helps keep the app input format consistent with the format used during training.
+
+### Slide 5: Input and output limits
+
+- Maximum article input: 512 tokens
+- Default maximum summary length: 128 tokens
+- Default minimum summary length: 20 tokens
+- Long articles are truncated from the right when they exceed the input limit.
+- Generated token spacing is removed before the Burmese summary is displayed.
+
+### Slide 6: Text generation
+
+The interface uses beam search to compare several possible summary sequences before selecting an output.
+
+Default generation settings:
+
+```text
+Maximum output length: 128
+Minimum output length: 20
+Beam count: 4
+Length penalty: 2.0
+No-repeat n-gram size: 3
+```
+
+These controls allow users to trade off summary length, search quality, speed, and repetition control.
+
+### Slide 7: Device and deployment
+
+- CUDA is selected automatically when available.
+- CPU is used automatically when CUDA is unavailable.
+- The tokenizer and model are loaded once and reused for later requests.
+- No model is downloaded from Hugging Face when local checkpoint files are present.
+- The interface binds only to `127.0.0.1:7860` by default.
+
+### Slide 8: Model strengths
+
+- Works directly with Burmese news-style articles.
+- Produces Burmese summaries without translation to another language.
+- Uses the same segmentation and task prefix as the training pipeline.
+- Runs privately on a local computer.
+- Supports both GPU and CPU inference.
+
+### Slide 9: Model limitations
+
+- The output is an AI-generated draft, not a verified fact sheet.
+- Important names, dates, numbers, and claims should be checked manually.
+- Long articles may lose information after truncation.
+- CPU generation can be slow for long articles or high beam counts.
+- Summary quality depends on the fine-tuning data and checkpoint quality.
+- The model can omit details, repeat ideas, or produce grammatically imperfect Burmese.
+
 ## Repository layout
 
 ```text
