@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local environment and editor files
+.env
+.vscode/
+.ipynb_checkpoints/
+
+# Training notebooks and generated training artifacts
+*.ipynb
+optimizer.pt
+rng_state.pth
+scheduler.pt
+trainer_state.json
+training_args.bin
+
+# Local Hugging Face checkpoint files
+config.json
+generation_config.json
+model.safetensors
+tokenizer.json
+tokenizer_config.json
+special_tokens_map.json
+spiece.model
+
+# Gradio and local runtime output
+gradio_cached_examples/
+logs/
